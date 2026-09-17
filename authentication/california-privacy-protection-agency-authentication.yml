@@ -1,0 +1,58 @@
+generated: '2026-09-17'
+method: searched
+source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/#authentication
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+  oauth: false
+  scopes: none
+  note: >-
+    Single static API key in the X-API-KEY header on every request. Keys are issued in the DROP Data
+    Broker Portal (https://databroker.drop.privacy.ca.gov/) only after the broker's account is
+    approved by CalPrivacy, registration or access fees are paid, and at least one consumer deletion
+    list is selected; the key is scoped to those selected lists. There is no OAuth, no scope
+    vocabulary, no self-serve developer sign-up: the credential is gated on the statutory
+    registration process, so an anonymous caller receives 401 and an unpaid or unregistered broker
+    receives 403.
+schemes:
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: X-API-KEY
+  description: API key issued through the Data Broker Portal. The key grants access only to
+    the consumer deletion lists selected during setup.
+  applies_to: all operations (top-level security requirement, repeated per operation)
+  sources:
+  - openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+  - https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/
+obtaining_credentials:
+  portal: https://databroker.drop.privacy.ca.gov/
+  steps:
+  - Sign in to the Data Broker Portal.
+  - Navigate to Home -> Consumer Deletion Lists and select the list(s) the business will process; click Save.
+  - Open the API Key tab and click "Get a new API key".
+  - For sandbox testing, navigate to SANDBOX ENVIRONMENT -> ISSUE SANDBOX API KEY.
+  prerequisites:
+  - DROP account created and approved by CalPrivacy (typically within two business days)
+  - Annual registration fee ($6,000 in 2026) or the month-dependent access fee paid
+  - At least one consumer deletion list selected
+key_rotation:
+  policy: >-
+    Regenerate the key if it is compromised or if the list selection changes. Issuing a new key
+    deactivates all previous keys (the "API Key Changed" notification says so).
+  storage_guidance: Store keys in environment variables or a secret management system.
+transport:
+  tls: TLS 1.2+ required
+verification:
+  connectivity_check: GET https://api.drop.privacy.ca.gov/data/download with the X-API-KEY header; 200 confirms authentication
+  observed_anonymous_response:
+    url: https://api.drop.privacy.ca.gov/data/download
+    status: 401
+    body: API key is missing or invalid. Fix or regenerate the API key and try again.
+    probed: '2026-09-17'
+errors:
+  '401': API key is missing or invalid — correct or regenerate the key
+  '403': Broker is not eligible — resolve account, registration, payment or access issue, or select at least one list

@@ -1,0 +1,103 @@
+generated: '2026-09-17'
+method: searched
+source: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/#notifications
+docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/
+also_in: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml (info.description "Notifications" section)
+asyncapi_published: false
+asyncapi_note: >-
+  CalPrivacy publishes no AsyncAPI document and the OpenAPI declares no top-level `webhooks` object
+  or callbacks. The webhook surface is documented in prose on the DROP technical reference page and
+  repeated verbatim in the OpenAPI info block. Nothing below is invented; it is the published catalog.
+surface: Optional outbound HTTPS notifications from DROP to a data broker's configured endpoint
+direction: DROP -> data broker
+enablement:
+  where: Data Broker Portal -> Notification settings
+  steps:
+  - Toggle Webhook to Active.
+  - Enter your HTTPS endpoint URL.
+  - Save changes.
+  default_channel: email to the primary and secondary contact addresses on the DROP account (always on)
+  webhook_channel: optional; a per-broker signing secret is generated and shown in the portal when enabled
+signing:
+  algorithm: HMAC-SHA256
+  signed_content: '<X-Webhook-Timestamp>.<raw request body>'
+  header: X-Webhook-Signature
+  format: 'sha256=<hex digest>'
+  secret: per-broker webhook signing secret from the portal; rotate as needed
+  replay_guidance: reject timestamps older than five minutes (recommended by the docs)
+headers:
+- name: X-Webhook-Event-Id
+  description: Unique ID for the logical event
+- name: X-Webhook-Event-Type
+  description: Event type (see events below)
+- name: X-Webhook-Delivery-Id
+  description: Unique ID for this delivery attempt
+- name: X-Webhook-Timestamp
+  description: UTC timestamp for the request (example 2026-07-02T18:30:00.0000000Z)
+- name: X-Webhook-Version
+  description: Webhook version (example 1.0)
+- name: X-Webhook-Signature
+  description: HMAC-SHA256 signature, sha256= prefixed
+body:
+  content_type: application/json
+  schema:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Human-readable message text
+  example:
+    message: download ready
+events:
+- type: download.ready
+  name: List Download Ready
+  when: Download package is ready
+  email: default
+  webhook: optional
+  related_operation: downloadData
+- type: upload.received
+  name: Upload Confirmation
+  when: Upload was received and is being processed
+  email: default
+  webhook: optional
+  related_operation: uploadData
+- type: upload.processed
+  name: List Upload Processed
+  when: Upload processing completed; responses available for review
+  email: default
+  webhook: optional
+  related_operation: uploadData
+- type: amendment.received
+  name: Amendment Confirmation
+  when: Amendment upload was received and is being processed
+  email: default
+  webhook: optional
+  related_operation: uploadAmend
+- type: amendment.processed
+  name: Amendment Upload Processed
+  when: Amendment processing completed and is ready for review
+  email: default
+  webhook: optional
+  related_operation: uploadAmend
+email_only_events:
+- name: API Key Issued
+  when: An API key has been issued for your account
+- name: API Key Changed
+  when: A new API key has been issued; all previous keys have been deactivated
+verification_steps:
+- Read the raw request body exactly as received.
+- Read X-Webhook-Timestamp.
+- Build the signing string "<timestamp>.<raw request body>".
+- Compute HMAC-SHA256 using the webhook signing secret.
+- Compare the hex digest to X-Webhook-Signature after removing the "sha256=" prefix, using a constant-time compare.
+- Reject the request if the signature is invalid.
+expected_response:
+  success: any 2xx; preferred HTTP/1.1 204 No Content
+  failure: DROP treats non-2xx responses as failed delivery and may retry
+retries:
+  behavior: may retry failed (non-2xx) deliveries
+  event_id: X-Webhook-Event-Id identifies the logical event; X-Webhook-Delivery-Id is unique per attempt — deduplicate on the event id
+event_catalog:
+  published: true
+  count: 5
+  payload_schemas: message-only (no per-event payload schema is published)

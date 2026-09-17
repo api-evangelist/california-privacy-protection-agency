@@ -1,0 +1,64 @@
+generated: '2026-09-17'
+method: derived
+source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+status: candidate
+name: DROP Data Broker API (candidate MCP tool surface)
+search_note: >-
+  No official MCP server exists. Searched: the DROP technical specifications on privacy.ca.gov,
+  cppa.ca.gov, npm (@modelcontextprotocol scope and free-text "calprivacy"/"drop data broker"),
+  GitHub repositories mentioning api.drop.privacy.ca.gov, and /.well-known/* on every DROP host —
+  none names an MCP endpoint. The tools below are a derivation from the three OpenAPI operations
+  and are NOT served by anyone; an agent cannot call them today.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: api-key
+  verified: derived
+  note: >-
+    mode none = candidate only. Any real server would need to carry the broker's X-API-KEY, which is
+    issued only to registered, fee-paid data brokers inside the Data Broker Portal, so a public
+    hosted MCP is unlikely to be offered by the agency; a broker-side local server wrapping the three
+    operations is the plausible shape.
+tools:
+- name: drop_download_deletion_lists
+  operationId: downloadData
+  method: GET
+  path: /data/download
+  description: Request or download the current ZIP archive of hashed consumer deletion lists (one CSV per selected list, plus a Removed CSV when identifiers were withdrawn). Returns 202 + Retry-After while the ZIP is being prepared.
+  inputSchema:
+    type: object
+    properties: {}
+  output: application/zip binary, or application/json {message} when preparing / nothing new
+  side_effects: opens a download batch that must be completed (all rows uploaded) before another can be requested (409)
+- name: drop_upload_status_responses
+  operationId: uploadData
+  method: POST
+  path: /data/upload
+  description: Upload one or more Id,Status CSV files reporting the outcome (2 exempted, 3 deleted, 4 opted out, 5 not found) for each work item in the current batch.
+  inputSchema:
+    type: object
+    required: [files]
+    properties:
+      files:
+        type: array
+        items: {type: string, format: binary}
+        description: CSV files named per the downloaded file name (optional _suffix of up to 10 alphanumerics); header must be exactly Id,Status
+  output: UploadResponse {message, acceptedCount, rejectedCount, accepted[], rejected[]}
+  side_effects: irreversible except via drop_amend_status_responses; duplicate file names are rejected
+- name: drop_amend_status_responses
+  operationId: uploadAmend
+  method: POST
+  path: /data/amend
+  description: Upload corrected Id,Status CSV files to update statuses submitted previously.
+  inputSchema:
+    type: object
+    required: [files]
+    properties:
+      files:
+        type: array
+        items: {type: string, format: binary}
+        description: Same naming and Id,Status schema as upload
+  output: UploadResponse
+  side_effects: overrides previously reported statuses for the listed work items

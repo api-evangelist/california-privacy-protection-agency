@@ -1,0 +1,72 @@
+generated: '2026-09-17'
+method: searched
+source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+docs:
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+- https://privacy.ca.gov/laws-and-regulations/drop-system-requirements/
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/#notifications
+regime: 'government (sector shortlist probed: dcat, ckan, eidas, fedramp, open-data-charter)'
+conformance:
+- id: openapi-3.1
+  conforms: true
+  evidence: 'openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml declares `openapi: 3.1.0` (info.version 1.2.0), fetched from https://dropresources.blob.core.windows.net/apidocs/databroker_api.yaml'
+- id: api-key-auth
+  conforms: true
+  evidence: 'components.securitySchemes.ApiKeyAuth (type apiKey, in header, name X-API-KEY) applied as the top-level security requirement'
+- id: oauth2
+  conforms: false
+  evidence: 'No oauth2 or openIdConnect securityScheme in the spec; /.well-known/oauth-authorization-server and /openid-configuration 404 on api.drop.privacy.ca.gov and privacy.ca.gov (300 MultiViews on cppa.ca.gov)'
+- id: oidc
+  conforms: false
+  evidence: 'as above'
+- id: rfc9457
+  conforms: false
+  evidence: 'Error bodies are application/json `{message}` (MessageResponse), not application/problem+json; see errors/california-privacy-protection-agency-problem-types.yml'
+- id: rfc9110-retry-after
+  conforms: true
+  evidence: 'Retry-After header declared on the 429 TooManyRequests response component and on the 202 of GET /data/download'
+- id: rfc8594-sunset
+  conforms: false
+  evidence: 'No Sunset or Deprecation headers documented; no deprecation policy published'
+- id: pagination
+  conforms: false
+  evidence: 'Batch/delta file exchange; no page, cursor or offset parameters exist in the contract'
+- id: idempotency-key
+  conforms: false
+  evidence: 'No Idempotency-Key header; replay protection is duplicate-file-name rejection (conventions idempotency block)'
+- id: hmac-signed-webhooks
+  conforms: true
+  evidence: 'Reference page "Secret verification" and OpenAPI info.description document HMAC-SHA256 over "<timestamp>.<raw body>" in X-Webhook-Signature (sha256= prefix); not Standard Webhooks (header names are X-Webhook-*)'
+- id: standard-webhooks
+  conforms: false
+  evidence: 'Bespoke X-Webhook-Id/Timestamp/Signature header set and "<timestamp>.<body>" signing string differ from the Standard Webhooks webhook-id/webhook-timestamp/webhook-signature "v1," scheme'
+- id: sha-256
+  conforms: true
+  evidence: 'All consumer identifiers are SHA-256 over UTF-8, Base64 output (HashBase64 schema, pattern ^[A-Za-z0-9+/]{43}=$)'
+- id: tls-1.2
+  conforms: true
+  evidence: 'Getting started prerequisites require "GET and POST requests over TLS 1.2+"; live probe of api.drop.privacy.ca.gov negotiated TLSv1.2 (security/california-privacy-protection-agency-domain-security.yml)'
+- id: dcat
+  conforms: false
+  evidence: 'The Data Broker Registry is published as CSV downloads at https://cppa.ca.gov/data_broker_registry/ with no DCAT catalog, data.json or CKAN endpoint'
+- id: ckan
+  conforms: false
+  evidence: 'no CKAN API found on cppa.ca.gov or privacy.ca.gov'
+- id: fedramp
+  conforms: false
+  evidence: 'no FedRAMP claim published; DROP is a state (not federal) system and the docs make no cloud-authorization statement'
+domain_standard:
+  declared: false
+  note: >-
+    The Delete Act deletion mechanism has no cross-vendor interchange standard (no Global Privacy
+    Control / Data Rights Protocol / IAB deletion-request schema is referenced anywhere in the
+    contract). The CSV schemas, list-type codes and hashing rules are CalPrivacy's own, defined by
+    Cal. Code Regs. tit. 11 § 7600 et seq. Reward-only dimension: nothing is claimed.
+legal_basis:
+- name: Delete Act (SB 362, Chapter 709, Statutes of 2023) — Cal. Civ. Code § 1798.99.80 et seq.
+  url: https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=CIV&division=3.&title=1.81.48.&part=4.&chapter=&article
+- name: Accessible Deletion Mechanism regulations — Cal. Code Regs. tit. 11 § 7600 et seq. (effective 2026-01-01)
+  url: https://privacy.ca.gov/wp-content/uploads/sites/357/2026/03/data_broker_drop_reg.pdf
+compliance_program:
+  published: false
+  note: CalPrivacy publishes no certifications (SOC 2, ISO 27001, StateRAMP) for DROP; no Compliance pointer is emitted.

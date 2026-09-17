@@ -1,0 +1,64 @@
+generated: '2026-09-17'
+method: searched
+source: https://privacy.ca.gov/drop-for-data-brokers/account-creation-fees-and-annual-registration/#fees
+docs: https://privacy.ca.gov/drop-for-data-brokers/account-creation-fees-and-annual-registration/
+currency: USD
+plan_count: 2
+model: statutory-fee
+note: >-
+  DROP is not a commercial API; access is a legal obligation under the Delete Act (Cal. Civ. Code
+  1798.99.80 et seq.). The "plans" are the statutory fees a data broker must pay inside DROP (by
+  credit card) before an API key can be issued. There is no free tier, no usage metering and no
+  per-call pricing; the API itself carries no charge beyond these fees. Non-compliance penalties
+  are recorded for completeness because they are the only other published dollar figures.
+plans:
+- name: Annual registration fee (2026)
+  who: Businesses that operated as a data broker in 2025 (register January 1-31, 2026; then annually)
+  price: 6000
+  currency: USD
+  billing_period: annual
+  overage: null
+  processing_fee: third-party electronic payment fee not to exceed 2.99%
+  refundable: false
+  prorated: false
+  includes:
+  - DROP account and Data Broker Portal access
+  - Production API key (after selecting consumer deletion lists)
+  - Sandbox environment and sandbox API key
+  - Listing in the California Data Broker Registry
+- name: Access fee (brokers beginning operations in 2026)
+  who: Businesses that begin brokering California consumers' data during 2026 (register for the first time in January 2027)
+  price: 6000
+  price_note: Declines by $500 per month of first payment; the schedule below is the published table.
+  currency: USD
+  billing_period: one-time (then annual registration from the following January)
+  overage: null
+  processing_fee: associated fee for processing electronic payments
+  schedule:
+  - {paid_in: January 2026, amount: 6000}
+  - {paid_in: February 2026, amount: 5500}
+  - {paid_in: March 2026, amount: 5000}
+  - {paid_in: April 2026, amount: 4500}
+  - {paid_in: May 2026, amount: 4000}
+  - {paid_in: June 2026, amount: 3500}
+  - {paid_in: July 2026, amount: 3000}
+  - {paid_in: August 2026, amount: 2500}
+  - {paid_in: September 2026, amount: 2000}
+  - {paid_in: October 2026, amount: 1500}
+  - {paid_in: November 2026, amount: 1000}
+  - {paid_in: December 2026, amount: 500}
+penalties_source: https://privacy.ca.gov/drop-for-data-brokers/
+penalties:
+  - name: Failure to register
+    amount: 200
+    currency: USD
+    period: per day
+    plus: CalPrivacy's cost of investigation and administrative action
+  - name: Failure to delete as required
+    amount: 200
+    currency: USD
+    period: per day per deletion request
+    plus: CalPrivacy's cost of investigation and administrative action
+payment:
+  method: credit card within DROP
+  alternative: contact CalPrivacy via https://databroker.drop.privacy.ca.gov/Contact if unable to pay by card

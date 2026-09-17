@@ -1,0 +1,89 @@
+generated: '2026-09-17'
+method: derived
+source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/working-with-data/
+api: DROP Data Broker API 1.2.0
+entities:
+- name: ConsumerDeletionList
+  kind: file (CSV inside the download ZIP)
+  schema_refs: [ListType, DownloadedCSVRow]
+  description: One CSV per selected list type (NDZ, Email, Phone, MAID, NameVIN, CTVID); header-only when no new identifiers
+  key: file name <YYYYMMDD>_<DataBrokerId>_<DataType>.csv
+- name: WorkItem
+  kind: row
+  schema_refs: [DownloadedCSVRow, WorkItemId, HashBase64]
+  description: A single consumer deletion request record; ID is 12-char Base62, permanent, unique across lists
+  key: ID
+- name: RemovedIdentifier
+  kind: row (Removed CSV)
+  schema_refs: [RemovedCSVRow, ListType]
+  description: A previously delivered work item withdrawn (e.g. consumer cancelled); carries ID, Hash and ListType
+  key: ID
+- name: StatusResponse
+  kind: row (uploaded CSV)
+  schema_refs: [UploadCSVRow, StatusCode]
+  description: Broker-reported outcome for one work item; Status in {2 Exempted, 3 Deleted, 4 Opted out, 5 Not found}
+  key: Id
+- name: UploadResult
+  kind: response object
+  schema_refs: [UploadResponse, AcceptedFileResult, RejectedFileResult]
+  description: Per-request summary of files accepted for validation and files rejected before validation
+- name: DownloadBatch
+  kind: implicit
+  description: The ZIP opened by GET /data/download; must be completed (all outstanding rows uploaded) before a new batch can be requested (409 otherwise)
+  key: ZIP file name <YYYYMMDD>_<DataBrokerId>_DROP.zip
+- name: DataBroker
+  kind: implicit (account in the Data Broker Portal)
+  description: The registered entity; identified in file names by the 4-digit DataBrokerId; owns the API key and list selection
+  key: DataBrokerId
+relationships:
+- from: DataBroker
+  to: DownloadBatch
+  type: has_many
+  via: DataBrokerId in ZIP/CSV file names
+- from: DownloadBatch
+  to: ConsumerDeletionList
+  type: has_many
+  via: one CSV per selected ListType (+ optional Removed file)
+- from: ConsumerDeletionList
+  to: WorkItem
+  type: has_many
+  via: rows (ID,Hash)
+- from: WorkItem
+  to: ConsumerDeletionList
+  type: belongs_to
+  via: ListType (also carried explicitly on RemovedCSVRow)
+- from: StatusResponse
+  to: WorkItem
+  type: belongs_to
+  via: Id == WorkItem.ID
+- from: RemovedIdentifier
+  to: WorkItem
+  type: belongs_to
+  via: ID
+- from: UploadResult
+  to: StatusResponse
+  type: has_many
+  via: accepted[].fileName -> uploaded CSV rows (row-level outcomes reported later by email)
+- from: DataBroker
+  to: ConsumerDeletionList
+  type: has_many
+  via: list selection in the portal scopes the API key
+schemas:
+  ListType: 'enum NDZ | Email | Phone | MAID | NameVIN | CTVID'
+  DataType: 'ListType + Removed (file-name vocabulary)'
+  StatusCode: 'integer enum 2 | 3 | 4 | 5 (0 and 1 unused)'
+  WorkItemId: 'string, 12 chars, ^[A-Za-z0-9]{12}$'
+  HashBase64: 'string, 44 chars, ^[A-Za-z0-9+/]{43}=$'
+  FileNamingConvention: 'YYYYMMDD ^[0-9]{8}$, DataBrokerId ^[0-9]{4}$, DataType, OptionalSuffix ^[A-Za-z0-9]{1,10}$'
+  MessageResponse: '{message}'
+  UploadResponse: '{message, acceptedCount, rejectedCount, accepted[AcceptedFileResult], rejected[RejectedFileResult]}'
+  AcceptedFileResult: '{fileName, fileSizeBytes}'
+  RejectedFileResult: '{fileName, message}'
+hashing:
+  algorithm: SHA-256 over UTF-8, Base64 output
+  single_field_lists: [Email, Phone, MAID, CTVID]
+  composite_lists:
+    NDZ: hash(hash(FirstName) + hash(LastName) + hash(DOB) + hash(ZIP))
+    NameVIN: hash(hash(FirstName) + hash(LastName) + hash(VIN))
+render: none (no subway/ diagram in this repo)

@@ -1,0 +1,17 @@
+generated: '2026-09-17'
+method: generated
+source: >-
+  openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml (all three
+  operationIds verified against the spec) plus the DROP technical specifications on privacy.ca.gov.
+  No provider-published skills, AGENTS.md or llms.txt were found on cppa.ca.gov, privacy.ca.gov or
+  the DROP hosts.
+skills:
+- file: california-privacy-protection-agency-process-deletion-requests.md
+  name: california-privacy-protection-agency-process-deletion-requests
+  method: generated
+  description: >-
+    Run one DROP download-match-upload cycle for a registered data broker: pull hashed consumer
+    deletion lists, match against standardized and hashed local records, report a status per work
+    item, amend if needed, repeat within 45 days.
+  operations: 3
+provider_published: []

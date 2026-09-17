@@ -1,0 +1,14 @@
+generated: '2026-09-17'
+method: searched
+source: >-
+  npm registry search (calprivacy, drop data broker california), PyPI search, GitHub code/repo search
+  for "api.drop.privacy.ca.gov" and "calprivacy DROP data broker", and the DROP technical
+  specifications on privacy.ca.gov, 2026-09-17.
+official_count: 0
+packages: []
+note: >-
+  CalPrivacy publishes no client library, CLI or SDK for the DROP Data Broker API on any registry
+  and the technical specifications reference only curl and PowerShell Invoke-WebRequest examples
+  (recorded in the OpenAPI as x-codeSamples). GitHub search for the API host returns zero public
+  repositories. No SDKs pointer is emitted. The only machine-readable distribution is the OpenAPI
+  YAML at https://dropresources.blob.core.windows.net/apidocs/databroker_api.yaml.

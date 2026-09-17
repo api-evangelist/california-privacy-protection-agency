@@ -1,0 +1,151 @@
+generated: '2026-09-17'
+method: probed
+source: >-
+  Live GET probes of the named /.well-known/* path list plus /apis.json, /apis.yml on every host the
+  record knows (cppa.ca.gov, www.cppa.ca.gov, privacy.ca.gov, www.privacy.ca.gov,
+  api.drop.privacy.ca.gov, databroker.drop.privacy.ca.gov, consumer.drop.privacy.ca.gov), 2026-09-17,
+  with a browser User-Agent (privacy.ca.gov sits behind Cloudflare and answers 403 to a bare client).
+summary:
+  hosts_probed: 7
+  documents_served: 0
+  note: >-
+    No host serves any discovery document. cppa.ca.gov answers HTTP 300 "Multiple Choices" (Apache
+    MultiViews) for every /.well-known/* path including a negative-control path that cannot exist, so
+    its 300s are misses, not documents. www.privacy.ca.gov 301s to privacy.ca.gov, which 404s
+    everything. consumer.drop.privacy.ca.gov 302s every unknown path to /error. The Delete Act's
+    OpenAPI is published off-host on Azure blob storage (dropresources.blob.core.windows.net) and is
+    not advertised through any /.well-known/api-catalog or apis.json. Because nothing hit, NO
+    WellKnown, SecurityTxt or APIsJSON pointer is emitted; this file records the absence.
+  path_echo_control:
+    path: /.well-known/cppa-negative-control-9a1f.json
+    cppa.ca.gov: 300 (same MultiViews page as every other path — host echoes; all 300s discarded)
+    privacy.ca.gov: 404 (passed)
+hosts:
+- host: cppa.ca.gov
+  role: Agency website
+  path_echo_control: failed
+  documents:
+  - {path: /.well-known/security.txt, status: 300, file: null, note: Apache MultiViews "Multiple Choices" HTML; not a document}
+  - {path: /.well-known/openid-configuration, status: 300, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 300, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 300, file: null}
+  - {path: /.well-known/api-catalog, status: 300, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 300, file: null}
+  - {path: /.well-known/agent-card.json, status: 300, file: null}
+  - {path: /.well-known/agent.json, status: 300, file: null}
+  - {path: /.well-known/apis.json, status: 300, file: null}
+  - {path: /apis.json, status: 404, file: null}
+  - {path: /apis.yml, status: 404, file: null}
+  - {path: /.well-known/ucp.json, status: 300, file: null}
+  - {path: /.well-known/acp.json, status: 300, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 300, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+- host: www.cppa.ca.gov
+  role: Agency website alias (same Apache MultiViews behaviour)
+  path_echo_control: failed
+  documents:
+  - {path: /.well-known/security.txt, status: 300, file: null}
+  - {path: /.well-known/openid-configuration, status: 300, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 300, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 300, file: null}
+  - {path: /.well-known/api-catalog, status: 300, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 300, file: null}
+  - {path: /.well-known/agent-card.json, status: 300, file: null}
+  - {path: /.well-known/agent.json, status: 300, file: null}
+  - {path: /.well-known/apis.json, status: 300, file: null}
+  - {path: /apis.json, status: 404, file: null}
+  - {path: /apis.yml, status: 404, file: null}
+  - {path: /.well-known/ucp.json, status: 300, file: null}
+  - {path: /.well-known/acp.json, status: 300, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 300, file: null}
+- host: privacy.ca.gov
+  role: CalPrivacy consumer + data broker documentation site (WordPress behind Cloudflare)
+  path_echo_control: passed
+  documents:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /.well-known/apis.json, status: 404, file: null}
+  - {path: /apis.json, status: 404, file: null}
+  - {path: /apis.yml, status: 404, file: null}
+  - {path: /.well-known/ucp.json, status: 404, file: null}
+  - {path: /.well-known/acp.json, status: 404, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+- host: www.privacy.ca.gov
+  role: Alias; every path 301s to privacy.ca.gov
+  documents:
+  - {path: /.well-known/security.txt, status: 301, file: null, note: redirects to privacy.ca.gov (404)}
+  - {path: /.well-known/openid-configuration, status: 301, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 301, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 301, file: null}
+  - {path: /.well-known/api-catalog, status: 301, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 301, file: null}
+  - {path: /.well-known/agent-card.json, status: 301, file: null}
+  - {path: /.well-known/agent.json, status: 301, file: null}
+  - {path: /.well-known/apis.json, status: 301, file: null}
+  - {path: /apis.json, status: 301, file: null}
+  - {path: /apis.yml, status: 301, file: null}
+  - {path: /.well-known/ucp.json, status: 301, file: null}
+  - {path: /.well-known/acp.json, status: 301, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 301, file: null}
+- host: api.drop.privacy.ca.gov
+  role: DROP Data Broker API host (Azure Front Door behind Cloudflare); root and every discovery path 404 with an empty body
+  documents:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /.well-known/apis.json, status: 404, file: null}
+  - {path: /apis.json, status: 404, file: null}
+  - {path: /apis.yml, status: 404, file: null}
+  - {path: /.well-known/ucp.json, status: 404, file: null}
+  - {path: /.well-known/acp.json, status: 404, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 404, file: null}
+  - {path: /openapi.json, status: 404, file: null, note: the real OpenAPI is off-host at https://dropresources.blob.core.windows.net/apidocs/databroker_api.yaml}
+  - {path: /swagger.json, status: 404, file: null}
+  - {path: /swagger/v1/swagger.json, status: 404, file: null}
+  - {path: /api-docs, status: 404, file: null}
+- host: databroker.drop.privacy.ca.gov
+  role: DROP Data Broker Portal (login-gated web app)
+  documents:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /.well-known/apis.json, status: 404, file: null}
+  - {path: /apis.json, status: 404, file: null}
+  - {path: /apis.yml, status: 404, file: null}
+  - {path: /.well-known/ucp.json, status: 404, file: null}
+  - {path: /.well-known/acp.json, status: 404, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 404, file: null}
+- host: consumer.drop.privacy.ca.gov
+  role: DROP consumer portal; every unknown path 302s to /error
+  documents:
+  - {path: /.well-known/security.txt, status: 302, file: null, note: redirect to /error}
+  - {path: /.well-known/openid-configuration, status: 302, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 302, file: null}
+  - {path: /.well-known/oauth-protected-resource, status: 302, file: null}
+  - {path: /.well-known/api-catalog, status: 302, file: null}
+  - {path: /.well-known/ai-plugin.json, status: 302, file: null}
+  - {path: /.well-known/agent-card.json, status: 302, file: null}
+  - {path: /.well-known/agent.json, status: 302, file: null}
+  - {path: /.well-known/apis.json, status: 302, file: null}
+  - {path: /apis.json, status: 302, file: null}
+  - {path: /apis.yml, status: 302, file: null}
+  - {path: /.well-known/ucp.json, status: 302, file: null}
+  - {path: /.well-known/acp.json, status: 302, file: null}
+  - {path: /.well-known/aauth-resource.json, status: 302, file: null}

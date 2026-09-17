@@ -1,0 +1,110 @@
+generated: '2026-09-17'
+method: searched
+source: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/#api-base-url
+docs:
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/
+- https://privacy.ca.gov/drop-for-data-brokers/process-drop-requests/#sandbox
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/working-with-data/#hashing
+name: DROP Sandbox
+available_since: March 2026 (per the DROP for data brokers timeline; technical docs 1.0.0 dated April 2, 2026)
+environments:
+- name: Production
+  base_url: https://api.drop.privacy.ca.gov
+  key_source: Data Broker Portal -> Home -> Consumer Deletion Lists -> API Key tab -> "Get a new API key"
+- name: Sandbox
+  base_url: https://api.drop.privacy.ca.gov/sandbox
+  key_source: Data Broker Portal -> SANDBOX ENVIRONMENT -> ISSUE SANDBOX API KEY
+  observed:
+    url: https://api.drop.privacy.ca.gov/sandbox/data/download
+    status: 401
+    probed: '2026-09-17'
+    note: The sandbox path is live and enforces the same X-API-KEY gate as production.
+separation:
+  mechanism: path prefix (/sandbox) on the same host, with a separately issued sandbox API key
+  key_prefix: none documented — sandbox and production keys are distinguished only by where they were issued
+access: >-
+  Requires an approved DROP data broker account; the sandbox is reached from inside the Data Broker
+  Portal. There is no anonymous or self-serve sandbox.
+tooling:
+- name: Standardization and Hashing Tool
+  where: DROP Sandbox (portal)
+  purpose: Verify an implementation of the standardization and hashing rules using fake data before matching real records.
+test_data:
+  note: >-
+    CalPrivacy publishes no test API keys, no fixture files and no magic identifiers. The only
+    published test vectors are the worked hashing examples on the Working with the data page,
+    reproduced verbatim below so an implementation can be checked offline. All hashes are SHA-256
+    over UTF-8 input, Base64 output.
+  hashing_examples:
+  - field: First name
+    input: Juan Pablo
+    standardized: juanpablo
+    sha256_base64: 91hIbrbzNeqHs3o81O5yNrXUj7wDd2shvZ6THKi9qz8=
+  - field: Last name
+    input: Martinez
+    standardized: martinez
+    sha256_base64: 2wRPGbwBNxhShjRczx8GfS2c4cjvs4NJskeWloUNtp8=
+  - field: Date of birth
+    input: July 4, 1776
+    standardized: '17760704'
+    sha256_base64: skXYXxBER6HQTZ3rXSZH1wVGLQ054mS5rbR/bwvzy4I=
+  - field: ZIP
+    input: 91790-3771
+    standardized: '91790'
+    sha256_base64: 2FPZucR4x7U8KlM+SFAX4LPGhwNz/PIZUCSUdDh0o/s=
+  - field: ZIP
+    input: M1B 1A1
+    standardized: m1b1a
+    sha256_base64: n8L9q8mVeT6Xt9/EeUNiTukGDrkbPJ3DvOEx14uElxk=
+  - field: ZIP
+    input: '00712345'
+    standardized: '71234'
+    sha256_base64: aeNUYKh7Xw5sqpxSbSP9eOHsj6iXewbUyavv89DIuhQ=
+  - field: Email
+    input: Anna.Smith@Domain.com
+    standardized: anna.smith@domain.com
+    sha256_base64: KA18MT/ph6IHYjzT9zwETySDQyvSh87YuoSBpOQtkhE=
+  - field: Phone
+    input: +1(415)555-9317
+    standardized: '4155559317'
+    sha256_base64: vGM7y5n+hBXRSEAklhHDPCbysyNgYTmXdMcagGUOY8E=
+  - field: VIN
+    input: 1HGCM82633A004352
+    standardized: 1hgcm82633a004352
+    sha256_base64: iNswy1m+0VSt8jAfFrvaiQ1R/0HAbgSwNGkwqo6QBss=
+  - field: MAID
+    input: a3f1c2d4-5678-90ab-cdef-1234567890ab
+    standardized: a3f1c2d4567890abcdef1234567890ab
+    sha256_base64: 250KY6lOgzYUB3EHrkbDCE2kMEZQE69SF38muhoDudI=
+  - field: CTVID
+    input: SmartTV_9F8E7D6C
+    standardized: smarttv9f8e7d6c
+    sha256_base64: d9fxuTIrKksBXYDlaWsvQbcyUUfCbUx7v78gd+KP+tc=
+  composite_examples:
+  - list: NDZ
+    input: Danielle Johnson, DOB July 4, 1985, ZIP 91790
+    order: FirstName + LastName + DOB + ZIP (each field hashed, Base64 hashes concatenated, hashed again)
+    field_hashes:
+      first_name: 5dUD1FgiKcTJq+JQ5JZUdlyIXrSbtJ338YYbt5/HNG4=
+      last_name: K+TjOqPiH2/3rRRPj9WCKKHM47UDQLSAX/DGNIDuxIg=
+      dob: IWi7qxOAbBJe0fNciDj76Eg84gmj40rB7aNMK/VnFOI=
+      zip: 2FPZucR4x7U8KlM+SFAX4LPGhwNz/PIZUCSUdDh0o/s=
+    final_hash: PQOfn1RffEKmqMmNAzDKKaoZCwxWbQZkQzPWmQo9REA=
+  - list: NameVIN
+    input: Eve Genesis, VIN 1HGCM82633A004352
+    order: FirstName + LastName + VIN
+    field_hashes:
+      first_name: hSYq33RRi7twx8uUzWFZ2RZp5age3x7+vVQ+rb2p+is=
+      last_name: ruutSnlvzC4V3ExgYbRe2bNz8mrfx5jKfS2MxYGCcY4=
+      vin: iNswy1m+0VSt8jAfFrvaiQ1R/0HAbgSwNGkwqo6QBss=
+    final_hash: rtnDuXIe63jXYQQXW5r07GJ7lSsrib8+46QuKFwkOmk=
+  example_csv_rows:
+    download: "ID,Hash\nA7kP2xQ9Lm4R,KA18MT/ph6IHYjzT9zwETySDQyvSh87YuoSBpOQtkhE="
+    upload: "Id,Status\nA7kP2xQ9Lm4R,2"
+    removed: "ID,Hash,ListType\nA7kP2xQ9Lm4R,KA18MT/ph6IHYjzT9zwETySDQyvSh87YuoSBpOQtkhE=,Email"
+  example_file_names:
+  - 20260312_4821_NDZ.csv
+  - 20260312_4821_Email.csv
+  - 20260312_4821_Email_part01.csv
+  - 20260312_4821_Removed.csv
+time_simulation: none documented

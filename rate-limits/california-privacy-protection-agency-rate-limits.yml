@@ -1,0 +1,35 @@
+generated: '2026-09-17'
+method: searched
+source: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/#error
+docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/
+limit_count: 0
+limits: []
+note: >-
+  CalPrivacy publishes no numeric rate limit for the DROP Data Broker API. The API operations page
+  and the OpenAPI document the exhaustion signal only: HTTP 429 Too Many Requests with a Retry-After
+  header (integer seconds, example 30) and the guidance "Wait 30 seconds and retry". No
+  X-RateLimit-* or RateLimit-* headers are documented. The 202 on GET /data/download also carries a
+  Retry-After (example 60) that tells the caller when to poll again while the ZIP is being prepared.
+  Separately, the statutory cadence is a floor rather than a ceiling: brokers must access DROP at
+  least once every 45 calendar days and may download more often.
+exhaustion:
+  status: 429
+  headers:
+  - name: Retry-After
+    description: Suggested number of seconds to wait before retrying
+    example: 30
+  body:
+    message: Too many requests. Wait and try again.
+  retry: true
+  guidance: Wait 30 seconds and retry
+polling:
+  status: 202
+  operation: downloadData
+  headers:
+  - name: Retry-After
+    description: Suggested number of seconds to wait before calling GET /data/download again
+    example: 60
+scope: unknown (not documented; the key is per data broker account)
+statutory_cadence:
+  minimum: at least once every 45 calendar days from August 1, 2026
+  source: https://privacy.ca.gov/drop-for-data-brokers/process-drop-requests/

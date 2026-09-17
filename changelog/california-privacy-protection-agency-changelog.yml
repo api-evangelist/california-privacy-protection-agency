@@ -1,0 +1,34 @@
+generated: '2026-09-17'
+method: searched
+source: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/#history
+docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/
+scheme: semantic-style documentation version (MAJOR.MINOR.PATCH) shared by the technical docs and the OpenAPI info.version
+current_version: 1.2.0
+current_date: '2026-07-02'
+entry_count: 3
+entries:
+- version: 1.2.0
+  date: '2026-07-02'
+  breaking: false
+  highlights:
+  - Clarifies handling for ZIP+4 standardization (drop the +4 before hashing).
+  - Adds supplemental information about work item Ids (12-character Base62, unique across lists, permanent).
+  - Adds system notification settings, including how to configure optional webhooks.
+  links:
+  - https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/working-with-data/#hashing
+  - https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/#notifications
+- version: 1.1.0
+  date: '2026-06-03'
+  breaking: false
+  highlights:
+  - General release of the technical documentation on privacy.ca.gov/drop-for-data-brokers.
+  - Adds information about cancellations and the Removed .csv file.
+- version: 1.0.0
+  date: '2026-04-02'
+  breaking: false
+  highlights:
+  - Initial release in DROP, accompanying the DROP Sandbox.
+note: >-
+  The version history covers the technical documentation and API contract together; there is no
+  separate API release feed, RSS or dated developer changelog. Agency-wide announcements live at
+  https://cppa.ca.gov/announcements/ and https://privacy.ca.gov/about-us/newsroom/.

@@ -1,0 +1,120 @@
+generated: '2026-09-17'
+method: searched
+source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/#error
+format: message-envelope
+format_note: >-
+  Errors are NOT RFC 9457 problem+json. Every non-2xx response is application/json with a single
+  `message` string (schema MessageResponse). Upload/amend 400s reuse the UploadResponse envelope
+  (message, acceptedCount, rejectedCount, accepted[], rejected[{fileName, message}]) so the
+  per-file rejection reason travels inside the 400 body. No error `code` field, no `type` URI, no
+  request id. The published retry table (Retry? yes/no) is reproduced under `retry`.
+envelope:
+  content_type: application/json
+  schema: MessageResponse
+  fields:
+    message: Human-readable response message
+  upload_variant:
+    schema: UploadResponse
+    fields:
+      message: Summary of the upload result
+      acceptedCount: Number of files accepted for validation
+      rejectedCount: Number of files rejected before validation
+      accepted: Files accepted for validation (fileName, fileSizeBytes)
+      rejected: Files rejected before validation (fileName, message)
+problem_types:
+- status: 400
+  title: Bad Request
+  operations: [uploadData, uploadAmend]
+  detail: Request is malformed or no files were accepted. Rejected files are listed with a per-file message.
+  example_message: Upload request is invalid. Fix the rejected files and try again.
+  retry: false
+  remediation: Fix the request, file, or CSV format before retrying.
+- status: 401
+  title: Unauthorized
+  operations: [downloadData, uploadData, uploadAmend]
+  detail: API key is missing or invalid.
+  example_message: API key is missing or invalid. Fix or regenerate the API key and try again.
+  retry: false
+  remediation: Correct or regenerate the API key in the Data Broker Portal before trying again.
+  observed:
+    url: https://api.drop.privacy.ca.gov/data/download
+    status: 401
+    probed: '2026-09-17'
+- status: 403
+  title: Forbidden
+  operations: [downloadData, uploadData, uploadAmend]
+  detail: Broker is not eligible to perform this operation (account, registration, payment or access issue).
+  example_message: Your account is not eligible for this operation. Resolve any account, registration, payment, or access issue and try again.
+  retry: false
+  remediation: Resolve the account, registration, payment or access issue in the portal.
+- status: 403
+  title: Forbidden - No selected lists
+  operations: [downloadData, uploadData, uploadAmend]
+  detail: No identifier list preferences are enabled; on upload, no upload is expected because no records are outstanding.
+  example_message: No identifier list preferences are enabled. Select at least one list and try again.
+  retry: false
+  remediation: Select at least one consumer deletion list in the portal (then regenerate the key), or call GET /data/download first.
+- status: 404
+  title: Not Found
+  operations: [downloadData, uploadData, uploadAmend]
+  detail: Endpoint URL is wrong or resource path does not exist.
+  example_message: The requested endpoint was not found. Check the URL/path and try again.
+  retry: false
+  remediation: Correct the URL/path and retry.
+- status: 409
+  title: Conflict - previous download not complete
+  operations: [downloadData]
+  detail: A prior download batch still has outstanding responses.
+  example_message: Complete the current batch or contact DROP support if a re-download is needed.
+  retry: false
+  remediation: Upload the outstanding responses for the current batch, or contact DROP support for a re-download.
+- status: 409
+  title: Conflict - no active download
+  operations: [uploadData]
+  detail: No active download is waiting for responses.
+  example_message: No active download is waiting for responses. Use GET /data/download to request or download a new ZIP file.
+  retry: false
+  remediation: Call GET /data/download to request a new ZIP first.
+- status: 409
+  title: Conflict - amend not processable
+  operations: [uploadAmend]
+  detail: The amend request cannot be processed in the current state.
+  example_message: The amend request cannot be processed in the current state.
+  retry: false
+  remediation: Complete the required action provided in the message before trying again.
+- status: 429
+  title: Too Many Requests
+  operations: [downloadData, uploadData, uploadAmend]
+  detail: Rate limited. A Retry-After header (seconds, example 30) is returned.
+  example_message: Too many requests. Wait and try again.
+  retry: true
+  remediation: Wait 30 seconds (or Retry-After) and retry.
+- status: 500
+  title: Server Error
+  operations: [downloadData, uploadData, uploadAmend]
+  detail: Temporary system error. (The API operations page lists 503 for upload/amend; the OpenAPI declares 500 on all three.)
+  example_message: The system is temporarily unavailable. Try again later.
+  retry: true
+  remediation: Retry later.
+file_rejections:
+  note: Returned inside the 400 (or 202 mixed) UploadResponse `rejected[].message`, one per file.
+  items:
+  - rejection: No CSV file provided
+    message: No CSV file was provided
+    remediation: Attach at least one CSV under the multipart field name `files`.
+  - rejection: Wrong file type
+    message: Only CSV files are accepted
+    remediation: Upload a CSV file, not a ZIP or other type.
+  - rejection: Invalid header
+    message: 'Invalid CSV header. Expected: Id,Status'
+    remediation: Fix the header row to exactly Id,Status.
+  - rejection: Duplicate file name
+    message: A file with this name was already uploaded for the current download. Use a unique suffix and try again
+    remediation: Append _<up to 10 alphanumerics> to the base file name.
+  - rejection: File unreadable
+    message: File could not be read as UTF-8 CSV
+    remediation: Save the file as UTF-8 CSV.
+record_level_errors:
+  channel: email to the primary and secondary contact addresses on the DROP account after processing
+  note: Row-level validation continues asynchronously after the 202; failures are reported by email, not by the API.

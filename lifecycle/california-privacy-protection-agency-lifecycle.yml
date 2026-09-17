@@ -1,0 +1,47 @@
+generated: '2026-09-17'
+method: searched
+source: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+docs:
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/#history
+- https://privacy.ca.gov/drop-for-data-brokers/
+- https://privacy.ca.gov/laws-and-regulations/drop-system-requirements/
+api: DROP Data Broker API
+status: production
+milestones:
+- date: '2025-11-06'
+  event: Accessible Deletion Mechanism (DROP) regulations approved by the Office of Administrative Law
+- date: '2026-01-01'
+  event: Regulations effective; consumers can submit DROP requests; data brokers begin creating accounts and registering
+- date: '2026-03-01'
+  event: DROP Sandbox available for testing (month-level date from the published timeline)
+- date: '2026-04-02'
+  event: Technical documentation / API 1.0.0 initial release
+- date: '2026-06-03'
+  event: Documentation 1.1.0 general release on privacy.ca.gov
+- date: '2026-07-02'
+  event: Documentation / OpenAPI 1.2.0
+- date: '2026-08-01'
+  event: Data brokers must begin processing DROP requests in production at least once every 45 days
+versioning:
+  scheme: documentation version in OpenAPI info.version; no URL or header versioning
+  current: 1.2.0
+  policy_published: false
+  note: No versioning policy, no compatibility promise and no announced next version. The single production base URL is unversioned.
+deprecation:
+  policy_published: false
+  sunset_header: not documented
+  deprecation_header: not documented
+  deprecated_operations: []
+  note: The OpenAPI marks nothing deprecated and the docs publish no deprecation or retirement policy; no Deprecation pointer is emitted.
+status_page:
+  published: false
+  url: null
+  note: No status page or uptime feed was found on cppa.ca.gov, privacy.ca.gov or the DROP hosts; no StatusPage pointer is emitted. Outages are handled by the statutory rule that a broker whose automated connection fails must notify CalPrivacy in writing within 45 days.
+sla:
+  published: false
+  note: No availability SLA. The only published timing commitments are statutory (45-day processing cadence) and operational (account approval typically within two business days).
+support:
+  channel: https://databroker.drop.privacy.ca.gov/Contact
+  help: https://privacy.ca.gov/drop-for-data-brokers/help/
+  issue_report_fields: [timestamp (Pacific Time), endpoint and HTTP status code, file name involved, upload response payload or error message]
+changelog: changelog/california-privacy-protection-agency-changelog.yml

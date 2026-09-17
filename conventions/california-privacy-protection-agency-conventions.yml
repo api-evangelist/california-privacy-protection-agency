@@ -1,0 +1,115 @@
+generated: '2026-09-17'
+method: searched
+source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+docs:
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/
+- https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/integration-workflow/
+api: DROP Data Broker API 1.2.0
+surface_summary:
+  operations: 3
+  reads: 1 (downloadData)
+  writes: 2 (uploadData, uploadAmend)
+  style: batch file exchange over HTTPS — a pull ZIP-of-CSVs, then multipart CSV uploads; not a resource-oriented CRUD API
+authentication:
+  style: api-key
+  header: X-API-KEY
+  scope: key is scoped to the consumer deletion lists selected in the portal
+  see: authentication/california-privacy-protection-agency-authentication.yml
+base_urls:
+  production: https://api.drop.privacy.ca.gov
+  sandbox: https://api.drop.privacy.ca.gov/sandbox
+content_negotiation:
+  download:
+    request_accept: application/zip, application/json
+    responses: application/zip (ZIP ready, with Content-Disposition attachment filename) or application/json (MessageResponse when preparing / no data)
+  upload:
+    request_content_type: multipart/form-data, field name `files`, one or more text/csv parts
+    response: application/json (UploadResponse)
+identifiers:
+  work_item_id: 12-character case-sensitive Base62 string, unique across all lists, permanently tied to one work item (pattern ^[A-Za-z0-9]{12}$)
+  data_broker_id: 4-digit short broker identifier embedded in file names
+  hash: SHA-256 over UTF-8, Base64 encoded, 44 characters (pattern ^[A-Za-z0-9+/]{43}=$)
+file_naming:
+  pattern: <YYYYMMDD>_<DataBrokerId>_<DataType>[_<OptionalSuffix>].csv
+  data_types: [NDZ, Email, Phone, MAID, NameVIN, CTVID, Removed]
+  suffix: up to 10 alphanumerics after an underscore, used to split a response into several uploads
+  encoding: UTF-8 CSV; download header ID,Hash (Removed adds ListType); upload header exactly Id,Status
+pagination:
+  style: none
+  note: >-
+    There is no page/cursor model. Each successful download is a batch; after the first download and
+    a completed upload, subsequent downloads contain only identifiers new since the previous batch
+    (delta semantics enforced server-side, with a 409 if the previous batch is not complete).
+async_pattern:
+  download: >-
+    GET /data/download is request-and-poll: 202 with Retry-After (example 60 s) while the ZIP is
+    being prepared, 200 application/zip when ready, 200 application/json when there is nothing new.
+  upload: >-
+    POST /data/upload and /data/amend return 202 as soon as files are accepted; row-level validation
+    continues asynchronously and outcomes are reported by email (and optionally by webhook).
+idempotency:
+  coverage: full
+  mechanism: natural-key duplicate rejection on the uploaded file name
+  header: none
+  scope:
+  - uploadData
+  - uploadAmend
+  semantics: reject-on-replay
+  retention: for the duration of the current download batch
+  note: >-
+    There is no Idempotency-Key header. The replay protection the docs publish is that a file whose
+    name was already uploaded for the current download is REJECTED ("A file with this name was
+    already uploaded for the current download. Use a unique suffix and try again"), which applies to
+    both mutating operations. A retried upload therefore cannot double-submit a response file, but
+    the retry receives a 400 rejection rather than the original 202 — a consumer must treat that
+    specific rejection as "already accepted" instead of as a failure. Download is a read and is
+    naturally safe to repeat (409 if the prior batch is open).
+reversibility:
+  grade: documented
+  read_only: false
+  surfaces:
+  - operation: uploadData
+    reversal: uploadAmend
+    reversal_description: POST /data/amend re-submits Id,Status rows to correct or update statuses reported earlier
+    window: not stated — the docs say only "use this endpoint when you need to correct or update a response that was already submitted" and 409 "The amend request cannot be processed in the current state"
+    docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/#amend
+  - operation: uploadAmend
+    reversal: uploadAmend
+    reversal_description: an amendment can itself be re-amended with another /data/amend upload
+    window: not stated
+    docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/#amend
+  - operation: downloadData
+    reversal: none
+    reversal_description: >-
+      a download opens a batch that can only be closed by uploading responses; a re-download of the
+      same batch requires contacting DROP support (409 message). Consumer-side cancellations arrive
+      as a Removed CSV in the next download rather than through any broker-initiated reversal.
+    window: not stated
+  note: >-
+    Reversal path exists (amend) but no window is published, so this grades `documented`, not
+    `verified`. No window has been invented.
+dry_run:
+  mode: sandbox-environment
+  note: No dry-run flag; the /sandbox base path with a sandbox key is the rehearsal surface.
+versioning:
+  scheme: documentation version (1.0.0, 1.1.0, 1.2.0) in the OpenAPI info.version and the reference page; no version segment in the URL and no version header
+  current: 1.2.0 (July 2, 2026)
+  see: changelog/california-privacy-protection-agency-changelog.yml
+error_envelope:
+  shape: '{"message": string} (MessageResponse); uploads use UploadResponse with accepted[]/rejected[]'
+  format: not RFC 9457
+  see: errors/california-privacy-protection-agency-problem-types.yml
+rate_limit_signaling:
+  status: 429
+  headers: [Retry-After]
+  see: rate-limits/california-privacy-protection-agency-rate-limits.yml
+request_tracing:
+  request_id_header: none documented
+  observed_edge_headers: [x-azure-ref, cf-ray]
+  note: Azure Front Door and Cloudflare reference ids appear on responses but are not documented as support correlation ids; support asks for timestamp (Pacific Time), endpoint, HTTP status, file name and payload instead.
+webhooks:
+  see: asyncapi/california-privacy-protection-agency-drop-webhooks.yml
+statutory_cadence:
+  processing_deadline: report status within 45 days; access DROP at least once every 45 calendar days from August 1, 2026
+  connection_failure_notice: notify CalPrivacy in writing through the DROP account within 45 days if the automated connection fails (Cal. Code Regs. tit. 11 § 7612(b)(1))

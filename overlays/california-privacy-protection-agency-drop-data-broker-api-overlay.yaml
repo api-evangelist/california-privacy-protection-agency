@@ -1,0 +1,40 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the DROP Data Broker API
+  version: 1.0.0
+  x-generated: '2026-09-17'
+  x-method: generated
+  x-source: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+extends: ../openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+actions:
+- target: $.info
+  description: Point the human-readable docs link at the live privacy.ca.gov technical specifications (the spec's externalDocs is a relative ./docs.html that 404s on the blob host).
+  update:
+    x-apievangelist-docs: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+    x-apievangelist-provider: california-privacy-protection-agency
+    contact:
+      name: DROP support (Data Broker Portal)
+      url: https://databroker.drop.privacy.ca.gov/Contact
+- target: $.externalDocs
+  description: Replace the relative externalDocs URL with the absolute technical-specifications page.
+  update:
+    url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+- target: $.paths['/data/download'].get
+  description: Annotate the read as safe to repeat and flag the 409 batch semantics for agents.
+  update:
+    x-apievangelist-side-effects: opens a download batch; 409 until the previous batch is completed
+    x-apievangelist-polling: 202 carries Retry-After (seconds); poll GET /data/download again
+    x-apievangelist-statutory-cadence: at least once every 45 calendar days from 2026-08-01
+- target: $.paths['/data/upload'].post
+  description: Record replay protection and reversibility as machine-readable extensions.
+  update:
+    x-apievangelist-idempotency: duplicate file name for the current download is rejected (400); retry with the same name is safe but returns 400 not 202
+    x-apievangelist-reversal: POST /data/amend (uploadAmend); no window published
+- target: $.paths['/data/amend'].post
+  description: Record that amend is the reversal path for upload.
+  update:
+    x-apievangelist-reverses: uploadData
+- target: $.components.responses.TooManyRequests
+  description: Note the published retry guidance next to the Retry-After header.
+  update:
+    x-apievangelist-retry-guidance: wait 30 seconds and retry

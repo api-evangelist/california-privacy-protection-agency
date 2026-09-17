@@ -1,20 +1,185 @@
 aid: california-privacy-protection-agency
 name: California Privacy Protection Agency
-description: 'California Privacy Protection Agency is a company surfaced via the API Evangelist harvest
-  backlog (source: operator-attribution) and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  The California Privacy Protection Agency (CPPA, branded CalPrivacy) is the state regulator that
+  administers and enforces the California Consumer Privacy Act and the Delete Act. Under the Delete
+  Act it operates DROP, the Delete Request and Opt-out Platform, through which California residents
+  file a single deletion request that every registered data broker must process at least once every
+  45 days beginning August 1, 2026. Data brokers integrate with DROP through the DROP Data Broker
+  API, a three-operation REST surface on api.drop.privacy.ca.gov (download hashed consumer deletion
+  lists as a ZIP of CSVs, upload Id,Status response files, amend prior responses) authenticated with
+  an X-API-KEY issued in the Data Broker Portal, with a sandbox environment, HMAC-SHA256 signed
+  webhook notifications, and an OpenAPI 3.1.0 contract published alongside the technical
+  specifications on privacy.ca.gov. The agency also publishes the California Data Broker Registry as
+  downloadable CSV files.
 url: https://raw.githubusercontent.com/api-evangelist/california-privacy-protection-agency/refs/heads/main/apis.yml
+image: https://cppa.ca.gov/images/logo.png
 x-type: company
 x-source: harvest:operator-attribution
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-17 found a published OpenAPI contract and technical specifications
 specificationVersion: '0.20'
 created: '2026-09-17'
 modified: '2026-09-17'
 tags:
-- Company
-apis: []
+- Government
+- Privacy
+- Data Brokers
+- Regulatory Compliance
+- Data Deletion
+- Consumer Rights
+- California
+- Webhooks
+apis:
+- aid: california-privacy-protection-agency:drop-data-broker-api
+  name: DROP Data Broker API
+  description: >-
+    Delete Act data broker integration API for the Delete Request and Opt-out Platform (DROP).
+    Data brokers pull a ZIP archive of hashed consumer identifiers (GET /data/download, one CSV per
+    selected consumer deletion list: NDZ, Email, Phone, MAID, NameVIN, CTVID, plus a Removed file),
+    match the SHA-256/Base64 hashes against their own standardized records, and report a status code
+    per work item (2 exempted, 3 deleted, 4 opted out, 5 not found) by uploading Id,Status CSV files
+    (POST /data/upload) or correcting earlier responses (POST /data/amend). Requests carry an
+    X-API-KEY scoped to the lists selected in the Data Broker Portal; a sandbox environment is served
+    under /sandbox on the same host. Published as OpenAPI 3.1.0 version 1.2.0 (July 2, 2026).
+  image: https://cppa.ca.gov/images/logo.png
+  humanURL: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+  baseURL: https://api.drop.privacy.ca.gov
+  tags:
+  - Data Brokers
+  - Data Deletion
+  - Privacy
+  - Regulatory Compliance
+  properties:
+  - type: OpenAPI
+    url: openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml
+  - type: OpenAPI
+    url: https://dropresources.blob.core.windows.net/apidocs/databroker_api.yaml
+  - type: Documentation
+    url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+  - type: APIReference
+    url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/
+  - type: GettingStarted
+    url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/
+  - type: Authentication
+    url: authentication/california-privacy-protection-agency-authentication.yml
+  - type: Conventions
+    url: conventions/california-privacy-protection-agency-conventions.yml
+  - type: Idempotency
+    url: conventions/california-privacy-protection-agency-conventions.yml
+  - type: ErrorCatalog
+    url: errors/california-privacy-protection-agency-problem-types.yml
+  - type: DataModel
+    url: data-model/california-privacy-protection-agency-data-model.yml
+  - type: RateLimits
+    url: rate-limits/california-privacy-protection-agency-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/california-privacy-protection-agency-sandbox.yml
+  - type: Overlay
+    url: overlays/california-privacy-protection-agency-drop-data-broker-api-overlay.yaml
+  - type: MCPServer
+    url: mcp/california-privacy-protection-agency-mcp.yml
+- aid: california-privacy-protection-agency:drop-webhook-notifications
+  name: DROP Webhook Notifications
+  description: >-
+    Optional outbound HTTPS webhook notifications from DROP to a data broker's endpoint, enabled in
+    the Data Broker Portal notification settings. Five event types (download.ready, upload.received,
+    upload.processed, amendment.received, amendment.processed) are delivered with X-Webhook-* headers
+    and an HMAC-SHA256 signature over "<timestamp>.<raw body>" using a per-broker signing secret.
+    Documented in prose in the DROP technical reference and the OpenAPI info block; no AsyncAPI is
+    published.
+  image: https://cppa.ca.gov/images/logo.png
+  humanURL: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/
+  baseURL: https://api.drop.privacy.ca.gov
+  tags:
+  - Webhooks
+  - Data Brokers
+  properties:
+  - type: Webhooks
+    url: asyncapi/california-privacy-protection-agency-drop-webhooks.yml
+  - type: Documentation
+    url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/
+common:
+- type: VulnerabilityDisclosure
+  url: security/california-privacy-protection-agency-vulnerability-disclosure.yml
+- type: Website
+  url: https://cppa.ca.gov/
+- type: Website
+  url: https://privacy.ca.gov/
+- type: DeveloperPortal
+  url: https://privacy.ca.gov/drop-for-data-brokers/
+- type: Documentation
+  url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
+- type: APIReference
+  url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/api-operations/
+- type: GettingStarted
+  url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/getting-started/
+- type: Support
+  url: https://privacy.ca.gov/drop-for-data-brokers/help/
+- type: Support
+  url: https://databroker.drop.privacy.ca.gov/Contact
+- type: Login
+  url: https://databroker.drop.privacy.ca.gov/
+- type: Pricing
+  url: https://privacy.ca.gov/drop-for-data-brokers/account-creation-fees-and-annual-registration/
+- type: TermsOfService
+  url: https://www.ca.gov/legal/conditions-of-use/
+- type: PrivacyPolicy
+  url: https://privacy.ca.gov/privacy-policy/
+- type: Blog
+  url: https://privacy.ca.gov/about-us/blog/
+- type: Newsroom
+  url: https://privacy.ca.gov/about-us/newsroom/
+- type: X
+  url: https://x.com/CalPrivacy
+- type: Documentation
+  url: https://cppa.ca.gov/data_broker_registry/
+  name: California Data Broker Registry (CSV downloads)
+- type: ChangeLog
+  url: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/#history
+- type: ChangeLog
+  url: changelog/california-privacy-protection-agency-changelog.yml
+- type: Lifecycle
+  url: lifecycle/california-privacy-protection-agency-lifecycle.yml
+- type: Authentication
+  url: authentication/california-privacy-protection-agency-authentication.yml
+- type: Conventions
+  url: conventions/california-privacy-protection-agency-conventions.yml
+- type: Idempotency
+  url: conventions/california-privacy-protection-agency-conventions.yml
+- type: ErrorCatalog
+  url: errors/california-privacy-protection-agency-problem-types.yml
+- type: DataModel
+  url: data-model/california-privacy-protection-agency-data-model.yml
+- type: RateLimits
+  url: rate-limits/california-privacy-protection-agency-rate-limits.yml
+- type: Plans
+  url: plans/california-privacy-protection-agency-plans-pricing.yml
+- type: Sandbox
+  url: sandbox/california-privacy-protection-agency-sandbox.yml
+- type: Webhooks
+  url: asyncapi/california-privacy-protection-agency-drop-webhooks.yml
+- type: MCPServer
+  url: mcp/california-privacy-protection-agency-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/california-privacy-protection-agency-llms.txt
+- type: Overlay
+  url: overlays/california-privacy-protection-agency-drop-data-broker-api-overlay.yaml
+- type: Conformance
+  url: conformance/california-privacy-protection-agency-conformance.yml
+- type: DomainSecurity
+  url: security/california-privacy-protection-agency-domain-security.yml
+- type: Packages
+  url: packages/california-privacy-protection-agency-packages.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+x-enrichment:
+  date: '2026-09-17'
+  status: enriched
+  artifacts_added: 22
+  pass: local-v3

@@ -29,6 +29,15 @@ tags:
 - Data Deletion
 - Consumer Rights
 - California
+- Webhook
+tags_raw:
+- Government
+- Privacy
+- Data Brokers
+- Regulatory Compliance
+- Data Deletion
+- Consumer Rights
+- California
 - Webhooks
 apis:
 - aid: california-privacy-protection-agency:drop-data-broker-api
@@ -92,6 +101,9 @@ apis:
   humanURL: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/reference/
   baseURL: https://api.drop.privacy.ca.gov
   tags:
+  - Webhook
+  - Data Brokers
+  tags_raw:
   - Webhooks
   - Data Brokers
   properties:

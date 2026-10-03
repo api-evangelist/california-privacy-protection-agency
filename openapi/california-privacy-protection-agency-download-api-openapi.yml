@@ -105,6 +105,21 @@ paths:
           $ref: '#/components/responses/ServerError'
 components:
   responses:
+    TooManyRequests:
+      description: Too many requests. Wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageResponse'
+          example:
+            message: Too many requests. Wait and try again.
+      headers:
+        Retry-After:
+          description: Suggested number of seconds to wait before retrying.
+          schema:
+            type: integer
+            minimum: 1
+          example: 30
     Forbidden:
       description: Broker is not eligible to access this operation.
       content:
@@ -120,6 +135,14 @@ components:
               summary: No selected lists
               value:
                 message: No identifier list preferences are enabled. Select at least one list and try again.
+    Unauthorized:
+      description: API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageResponse'
+          example:
+            message: API key is missing or invalid. Fix or regenerate the API key and try again.
     ServerError:
       description: Temporary system error. Retry later.
       content:
@@ -136,29 +159,6 @@ components:
             $ref: '#/components/schemas/MessageResponse'
           example:
             message: The requested endpoint was not found. Check the URL/path and try again.
-    Unauthorized:
-      description: API key is missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MessageResponse'
-          example:
-            message: API key is missing or invalid. Fix or regenerate the API key and try again.
-    TooManyRequests:
-      description: Too many requests. Wait before retrying.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MessageResponse'
-          example:
-            message: Too many requests. Wait and try again.
-      headers:
-        Retry-After:
-          description: Suggested number of seconds to wait before retrying.
-          schema:
-            type: integer
-            minimum: 1
-          example: 30
   schemas:
     MessageResponse:
       type: object

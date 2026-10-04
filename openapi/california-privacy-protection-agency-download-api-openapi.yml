@@ -104,22 +104,24 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 components:
+  schemas:
+    MessageResponse:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+          description: Human-readable response message.
   responses:
-    TooManyRequests:
-      description: Too many requests. Wait before retrying.
+    ServerError:
+      description: Temporary system error. Retry later.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/MessageResponse'
           example:
-            message: Too many requests. Wait and try again.
-      headers:
-        Retry-After:
-          description: Suggested number of seconds to wait before retrying.
-          schema:
-            type: integer
-            minimum: 1
-          example: 30
+            message: The system is temporarily unavailable. Try again later.
     Forbidden:
       description: Broker is not eligible to access this operation.
       content:
@@ -143,14 +145,21 @@ components:
             $ref: '#/components/schemas/MessageResponse'
           example:
             message: API key is missing or invalid. Fix or regenerate the API key and try again.
-    ServerError:
-      description: Temporary system error. Retry later.
+    TooManyRequests:
+      description: Too many requests. Wait before retrying.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/MessageResponse'
           example:
-            message: The system is temporarily unavailable. Try again later.
+            message: Too many requests. Wait and try again.
+      headers:
+        Retry-After:
+          description: Suggested number of seconds to wait before retrying.
+          schema:
+            type: integer
+            minimum: 1
+          example: 30
     NotFound:
       description: Endpoint URL is wrong or resource path does not exist.
       content:
@@ -159,15 +168,6 @@ components:
             $ref: '#/components/schemas/MessageResponse'
           example:
             message: The requested endpoint was not found. Check the URL/path and try again.
-  schemas:
-    MessageResponse:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-          description: Human-readable response message.
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

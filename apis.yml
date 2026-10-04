@@ -68,6 +68,8 @@ apis:
   humanURL: https://privacy.ca.gov/drop-for-data-brokers/technical-specifications/
   baseURL: https://api.drop.privacy.ca.gov
   tags:
+  - Downloads
+  tags_raw:
   - Download
   properties:
   - type: OpenAPI
@@ -123,6 +125,9 @@ apis:
   - type: Sandbox
     url: sandbox/california-privacy-protection-agency-sandbox.yml
 common:
+- type: CapabilityMap
+  url: capabilities/california-privacy-protection-agency-capability-edges.yml
+  name: California Privacy Protection Agency Business Capability Map
 - type: VulnerabilityDisclosure
   url: security/california-privacy-protection-agency-vulnerability-disclosure.yml
 - type: Website

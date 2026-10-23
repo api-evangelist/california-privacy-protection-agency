@@ -9,6 +9,9 @@ artifacts:
   authentication/california-privacy-protection-agency-authentication.yml:
     method: searched
     evidence: declared in the artifact
+  capabilities/california-privacy-protection-agency-capability-edges.yml:
+    method: unknown
+    evidence: no authorship recorded
   changelog/california-privacy-protection-agency-changelog.yml:
     method: searched
     evidence: declared in the artifact
@@ -27,7 +30,7 @@ artifacts:
   front-door-ai/2026-09-17.yml:
     method: unknown
     evidence: no authorship recorded
-  kin/checks-2026-09-24T161608.yml:
+  kin/checks-2026-10-11T110117.yml:
     method: generated
     evidence: Kin Score snapshot written by score.rb
   kin/score-2026-09-17T233623.yml:
@@ -72,6 +75,21 @@ artifacts:
   kin/score-2026-09-24T161608.yml:
     method: generated
     evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-09-25T210408.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-09-25T232841.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-03T000835.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-03T024842.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-11T110117.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
   lifecycle/california-privacy-protection-agency-lifecycle.yml:
     method: searched
     evidence: declared in the artifact
@@ -85,12 +103,15 @@ artifacts:
     method: harvested
     evidence: found in openapi/_original/; the fetch URL and bytes were not recorded, so byte-identity
       to the provider's source is unverified
-  openapi/california-privacy-protection-agency-drop-data-broker-api-openapi.yml:
+  openapi/california-privacy-protection-agency-download-api-openapi.yml:
+    method: derived
+    evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
+  openapi/california-privacy-protection-agency-upload-api-openapi.yml:
     method: derived
     evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
   overlays/california-privacy-protection-agency-drop-data-broker-api-overlay.yaml:
-    method: generated
-    evidence: declared in the artifact
+    method: derived
+    evidence: an API Evangelist overlay (title) over the provider's contract
   packages/california-privacy-protection-agency-packages.yml:
     method: searched
     evidence: declared in the artifact
